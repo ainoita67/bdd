@@ -20,7 +20,7 @@ ORDER BY c.fecha;
 
 
 
-CREATE VIEW InformeDiariaContratos AS
+CREATE VIEW InformeDiarioContratos AS
 SELECT
 	"resertva" as tipo,
     null as contrato,
@@ -51,3 +51,39 @@ JOIN Reserva r on c.reserva=r.num
 WHERE DATE(fecha) = DATE(CURDATE())
 
 ORDER BY empleado;
+
+CREATE VIEW IncidenciasPendientes AS
+SELECT cod, descripcion, p_compra, p_venta, f_ini, f_fin, mayorista
+FROM Paquete
+WHERE CURDATE() BETWEEN f_ini AND f_fin;
+
+drop view PlanningSemanalContratos;
+CREATE VIEW PlanningSemanalContratos AS
+SELECT
+    c.cod AS contrato,
+    c.reserva,
+    c.fecha,
+    DAYNAME(c.fecha) AS dia_semana,
+    r.cliente
+FROM Contrato c
+JOIN Reserva r ON c.reserva = r.num
+WHERE WEEK(c.fecha, 1) = WEEK(CURDATE(), 1) AND YEAR(c.fecha) = YEAR(CURDATE())
+ORDER BY c.fecha;
+
+
+
+
+
+SELECT 
+	d.parte,
+	d.num as incidencia,
+    c.cod as contrato,
+    d.descripcion, 
+    d.transmitida, 
+    d.resuelta, 
+    d.cerrada 
+FROM DetalleIncidenciaVuelo d
+JOIN ParteIncidencia p on d.parte = p.cod
+JOIN Reserva r on r.num = p.reserva
+JOIN Contrato c on r.num = c.reserva
+;
